@@ -1,0 +1,3 @@
+[submodule "thirdparty/cppjieba"]
+	path = thirdparty/cppjieba
+	url = https://github.com/yanyiwu/cppjieba
