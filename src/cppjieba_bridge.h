@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void *jieba_new();
+void *jieba_new(const char *dictPath, const char *hmmPath, const char *userDictPath, const char *idfPath, const char *stopWordPath);
 void jieba_free(void *jieba_instance);
 char **jieba_cut(void *jieba_instance, const char *str, size_t len, int hmm);
 char **jieba_cut_all(void *jieba_instance, const char *str, size_t len);

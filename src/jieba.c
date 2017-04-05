@@ -13,7 +13,6 @@ static zend_object *createJiebaResource(zend_class_entry *ce) {
     zend_object_std_init(&resource->zo, ce);
     object_properties_init(&resource->zo, ce);
     resource->zo.handlers = &OBJECT_HANDLER(Jieba);
-    resource->jieba_instance = jieba_new();
     return &resource->zo;
 }
 
@@ -30,7 +29,9 @@ static convertArray(zval *array, char **result){
 void freeJiebaResource(zend_object *object) {
     jieba_ext_t *resource;
     resource = FETCH_RESOURCE(object, jieba_ext_t);
-    jieba_free(resource->jieba_instance);
+    if(resource->jieba_instance){
+        jieba_free(resource->jieba_instance);
+    }
     zend_object_std_dtor(&resource->zo);
     efree(resource);
 }
@@ -39,6 +40,31 @@ PHP_METHOD(Jieba, __construct) {
     jieba_ext_t *resource;
     zval *self = getThis();
     resource = FETCH_OBJECT_RESOURCE(self, jieba_ext_t);
+    const char *dictPath, *hmmPath, *userDictPath, *idfPath, *stopWordPath;
+    const char *c_dictPath, *c_hmmPath, *c_userDictPath, *c_idfPath, *c_stopWordPath;
+    size_t dictPath_len, hmmPath_len, userDictPath_len, idfPath_len, stopWordPath_len;
+
+    if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "sssss", 
+            &dictPath, &dictPath_len,
+            &hmmPath, &hmmPath_len,
+            &userDictPath, &userDictPath_len,
+            &idfPath, &idfPath_len,
+            &stopWordPath, &stopWordPath_len
+        )){
+        return;
+    }
+
+    MAKE_C_STR(c_dictPath, dictPath, dictPath_len);
+    MAKE_C_STR(c_hmmPath, hmmPath, hmmPath_len);
+    MAKE_C_STR(c_userDictPath, userDictPath, userDictPath_len);
+    MAKE_C_STR(c_idfPath, idfPath, idfPath_len);
+    MAKE_C_STR(c_stopWordPath, stopWordPath, stopWordPath_len);
+    resource->jieba_instance = jieba_new(c_dictPath, c_hmmPath, c_userDictPath, c_idfPath, c_stopWordPath);
+    efree(c_dictPath);
+    efree(c_hmmPath);
+    efree(c_userDictPath);
+    efree(c_idfPath);
+    efree(c_stopWordPath);
 }
 
 PHP_METHOD(Jieba, cut) {
@@ -46,7 +72,7 @@ PHP_METHOD(Jieba, cut) {
     char **result;
     zval *self = getThis();
     const char *str = NULL;
-    size_t str_len;    
+    size_t str_len;
     zval result_arr;
     int hmm = 0;
     

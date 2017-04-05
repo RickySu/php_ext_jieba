@@ -18,14 +18,15 @@ static inline char **buildResult(vector<string> words){
     return result;
 }
 
-void * jieba_new() {
+void * jieba_new(const char *dictPath, const char *hmmPath, const char *userDictPath, const char *idfPath, const char *stopWordPath) {
     cppjieba::Jieba *jieba;
+    cout << dictPath;
     jieba = new cppjieba::Jieba(
-        DICT_PATH,
-        HMM_PATH,
-        USER_DICT_PATH,
-        IDF_PATH,
-        STOP_WORD_PATH
+        dictPath,
+        hmmPath,
+        userDictPath,
+        idfPath,
+        stopWordPath
     );
     return (void *) jieba;
 }
