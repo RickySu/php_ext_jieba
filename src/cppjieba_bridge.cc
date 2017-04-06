@@ -20,7 +20,6 @@ static inline char **buildResult(vector<string> words){
 
 void * jieba_new(const char *dictPath, const char *hmmPath, const char *userDictPath, const char *idfPath, const char *stopWordPath) {
     cppjieba::Jieba *jieba;
-    cout << dictPath;
     jieba = new cppjieba::Jieba(
         dictPath,
         hmmPath,
